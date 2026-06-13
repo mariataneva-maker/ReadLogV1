@@ -1,9 +1,10 @@
 {
   "expo": {
-    "name": "readlog",
+    "name": "ReadLog",
     "slug": "readlog",
     "version": "1.0.0",
     "orientation": "portrait",
+    "scheme": "readlog",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
