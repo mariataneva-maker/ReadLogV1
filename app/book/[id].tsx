@@ -9,7 +9,7 @@ import {
   Image,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useBooksStore, Quote } from '../../src/store/books';
+import { useBooksStore, Quote, Note } from '../../src/store/books';
 import { BookCover, Tag, ProgressBar, FAB } from '../../src/components';
 import { Colors, Typography, FontFamily, Radius, Shadow } from '../../src/theme';
 
@@ -18,13 +18,14 @@ type Tab = 'info' | 'quotes' | 'notes';
 export default function BookDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const { books, quotes } = useBooksStore();
+  const { books, quotes, notes } = useBooksStore();
   const [tab, setTab] = useState<Tab>('quotes');
 
   const book = books.find((b) => b.id === id);
   if (!book) return null;
 
   const bookQuotes = quotes.filter((q) => q.bookId === id);
+  const bookNotes = notes.filter((n) => n.bookId === id);
   const pct = Math.round((book.currentPage / book.totalPages) * 100);
 
   return (
@@ -67,7 +68,7 @@ export default function BookDetailScreen() {
         <TouchableOpacity
           style={styles.cta}
           activeOpacity={0.85}
-          onPress={() => router.push({ pathname: '/capture', params: { bookId: id } })}
+          onPress={() => router.push({ pathname: '/log-progress', params: { bookId: id } })}
         >
           <Text style={styles.ctaText}>Log reading</Text>
         </TouchableOpacity>
@@ -77,7 +78,7 @@ export default function BookDetailScreen() {
           {(['info', 'quotes', 'notes'] as Tab[]).map((t) => (
             <TouchableOpacity key={t} onPress={() => setTab(t)} style={styles.tabBtn} activeOpacity={0.7}>
               <Text style={[styles.tabLabel, tab === t && styles.tabLabelOn]}>
-                {t === 'info' ? 'Book info' : t === 'quotes' ? `Quotes ${bookQuotes.length}` : 'Notes 0'}
+                {t === 'info' ? 'Book info' : t === 'quotes' ? `Quotes ${bookQuotes.length}` : `Notes ${bookNotes.length}`}
               </Text>
               {tab === t && <View style={styles.tabUnderline} />}
             </TouchableOpacity>
@@ -97,8 +98,14 @@ export default function BookDetailScreen() {
           </View>
         )}
         {tab === 'notes' && (
-          <View style={styles.empty}>
-            <Text style={Typography.meta}>No notes yet — tap + to add one.</Text>
+          <View>
+            {bookNotes.length === 0 ? (
+              <View style={styles.empty}>
+                <Text style={Typography.meta}>No notes yet — tap + to add one.</Text>
+              </View>
+            ) : (
+              bookNotes.map((n) => <NoteRow key={n.id} note={n} />)
+            )}
           </View>
         )}
         {tab === 'info' && (
@@ -115,6 +122,19 @@ export default function BookDetailScreen() {
 
       <FAB onPress={() => router.push({ pathname: '/capture', params: { bookId: id } })} />
     </SafeAreaView>
+  );
+}
+
+function NoteRow({ note }: { note: Note }) {
+  return (
+    <View style={styles.quoteRow}>
+      <Text style={[styles.quoteText, { fontSize: 16, lineHeight: 24 }]}>{note.text}</Text>
+      <View style={styles.quoteMeta}>
+        <Text style={Typography.meta}>
+          {note.page ? `Page ${note.page}` : ''}{note.chapter ? ` · Chapter ${note.chapter}` : ''}
+        </Text>
+      </View>
+    </View>
   );
 }
 

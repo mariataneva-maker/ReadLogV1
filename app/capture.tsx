@@ -17,11 +17,11 @@ import { Colors, Typography, FontFamily, Radius, Shadow } from '../src/theme';
 type Mode = 'quote' | 'note';
 
 export default function CaptureScreen() {
-  const { bookId } = useLocalSearchParams<{ bookId?: string }>();
+  const { bookId, mode: initialMode } = useLocalSearchParams<{ bookId?: string; mode?: string }>();
   const router = useRouter();
-  const { books, addQuote } = useBooksStore();
+  const { books, addQuote, addNote } = useBooksStore();
 
-  const [mode, setMode] = useState<Mode>('quote');
+  const [mode, setMode] = useState<Mode>((initialMode === 'note' ? 'note' : 'quote') as Mode);
   const [text, setText] = useState('');
   const [page, setPage] = useState('');
   const [chapter, setChapter] = useState('');
@@ -32,16 +32,27 @@ export default function CaptureScreen() {
 
   function handleSave() {
     if (!text.trim()) return;
-    addQuote({
-      id: Date.now().toString(),
-      bookId: book.id,
-      text: text.trim(),
-      page: parseInt(page) || 0,
-      chapter: parseInt(chapter) || 0,
-      tag: tag.trim() || undefined,
-      myNote: myNote.trim() || undefined,
-      createdAt: new Date().toISOString(),
-    });
+    if (mode === 'quote') {
+      addQuote({
+        id: Date.now().toString(),
+        bookId: book.id,
+        text: text.trim(),
+        page: parseInt(page) || 0,
+        chapter: parseInt(chapter) || 0,
+        tag: tag.trim() || undefined,
+        myNote: myNote.trim() || undefined,
+        createdAt: new Date().toISOString(),
+      });
+    } else {
+      addNote({
+        id: Date.now().toString(),
+        bookId: book.id,
+        text: text.trim(),
+        page: parseInt(page) || undefined,
+        chapter: parseInt(chapter) || undefined,
+        createdAt: new Date().toISOString(),
+      });
+    }
     router.back();
   }
 
