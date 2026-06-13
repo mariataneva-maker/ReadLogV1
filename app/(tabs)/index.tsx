@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useBooksStore, Book } from '../../src/store/books';
 import { BookCover, Pill, ProgressBar, FAB } from '../../src/components';
 import { Colors, Typography, FontFamily, Shadow, Radius } from '../../src/theme';
@@ -17,6 +18,7 @@ type FilterStatus = 'not_started' | 'reading' | 'completed';
 export default function LibraryScreen() {
   const { books } = useBooksStore();
   const [filter, setFilter] = useState<FilterStatus>('reading');
+  const router = useRouter();
 
   const filtered = books.filter((b) => b.status === filter);
   const reading = books.filter((b) => b.status === 'reading');
@@ -94,7 +96,7 @@ export default function LibraryScreen() {
         <View style={{ height: 140 }} />
       </ScrollView>
 
-      <FAB onPress={() => {}} />
+      <FAB onPress={() => router.push('/capture')} />
     </SafeAreaView>
   );
 }
@@ -136,8 +138,9 @@ function DotIndicator({ count, active }: { count: number; active: number }) {
 }
 
 function BookCard({ book }: { book: Book }) {
+  const router = useRouter();
   return (
-    <View style={styles.card}>
+    <TouchableOpacity style={styles.card} activeOpacity={0.75} onPress={() => router.push(`/book/${book.id}`)}>
       <BookCover uri={book.coverUrl} size="sm" />
       <View style={styles.cardInfo}>
         <Text style={styles.cardTitle} numberOfLines={2}>
@@ -153,7 +156,7 @@ function BookCard({ book }: { book: Book }) {
           Page {book.currentPage} of {book.totalPages}
         </Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 

@@ -27,12 +27,23 @@ export interface Quote {
   createdAt: string;
 }
 
+export interface Note {
+  id: string;
+  bookId: string;
+  text: string;
+  page?: number;
+  chapter?: number;
+  createdAt: string;
+}
+
 interface BooksState {
   books: Book[];
   quotes: Quote[];
+  notes: Note[];
   addBook: (book: Book) => void;
   updateProgress: (bookId: string, page: number) => void;
   addQuote: (quote: Quote) => void;
+  addNote: (note: Note) => void;
 }
 
 const SEED_BOOKS: Book[] = [
@@ -99,7 +110,7 @@ const SEED_QUOTES: Quote[] = [
   {
     id: 'q3',
     bookId: '2',
-    text: "The best arguments in the world won’t change a person’s mind. The only thing that can do that is a good story.",
+    text: "The best arguments in the world won't change a person's mind. The only thing that can do that is a good story.",
     page: 194,
     chapter: 5,
     tag: 'Storytelling',
@@ -107,13 +118,26 @@ const SEED_QUOTES: Quote[] = [
   },
 ];
 
+const SEED_NOTES: Note[] = [
+  {
+    id: 'n1',
+    bookId: '1',
+    text: 'The compounding effect applies to habits the same way it does to money — small improvements accumulate into remarkable results.',
+    page: 15,
+    chapter: 1,
+    createdAt: new Date().toISOString(),
+  },
+];
+
 export const useBooksStore = create<BooksState>((set) => ({
   books: SEED_BOOKS,
   quotes: SEED_QUOTES,
+  notes: SEED_NOTES,
   addBook: (book) => set((s) => ({ books: [...s.books, book] })),
   updateProgress: (bookId, page) =>
     set((s) => ({
       books: s.books.map((b) => (b.id === bookId ? { ...b, currentPage: page } : b)),
     })),
   addQuote: (quote) => set((s) => ({ quotes: [...s.quotes, quote] })),
+  addNote: (note) => set((s) => ({ notes: [...s.notes, note] })),
 }));
