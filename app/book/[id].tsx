@@ -18,7 +18,7 @@ type Tab = 'info' | 'quotes' | 'notes';
 export default function BookDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const { books, quotes, notes } = useBooksStore();
+  const { books, quotes, notes, streak } = useBooksStore();
   const [tab, setTab] = useState<Tab>('quotes');
 
   const book = books.find((b) => b.id === id);
@@ -56,7 +56,7 @@ export default function BookDetailScreen() {
         <View style={styles.progSection}>
           <View style={styles.progRow}>
             <Text style={Typography.meta}>Progress</Text>
-            <Text style={Typography.meta}>5-day streak</Text>
+            <Text style={Typography.meta}>{streak > 0 ? `${streak}-day streak` : 'No streak yet'}</Text>
           </View>
           <ProgressBar progress={book.currentPage / book.totalPages} height={3} style={{ marginTop: 12 }} />
           <Text style={[Typography.meta, { marginTop: 11 }]}>

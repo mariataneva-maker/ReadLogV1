@@ -34,7 +34,7 @@ export default function LibraryScreen() {
         {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>Library</Text>
-          <TouchableOpacity style={styles.addBtn} activeOpacity={0.7}>
+          <TouchableOpacity style={styles.addBtn} activeOpacity={0.7} onPress={() => router.push('/search')}>
             <Text style={styles.addBtnText}>+ Add book</Text>
           </TouchableOpacity>
         </View>

@@ -12,6 +12,9 @@ import {
   HankenGrotesk_600SemiBold,
 } from '@expo-google-fonts/hanken-grotesk';
 import * as SplashScreen from 'expo-splash-screen';
+import { initDb } from '../src/db';
+import { seedIfEmpty } from '../src/db/seed';
+import { useBooksStore } from '../src/store/books';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -25,8 +28,14 @@ export default function RootLayout() {
     HankenGrotesk_600SemiBold,
   });
 
+  const loadAll = useBooksStore((s) => s.loadAll);
+
   useEffect(() => {
-    if (fontsLoaded) SplashScreen.hideAsync();
+    if (!fontsLoaded) return;
+    initDb();
+    seedIfEmpty();
+    loadAll();
+    SplashScreen.hideAsync();
   }, [fontsLoaded]);
 
   if (!fontsLoaded) return null;
@@ -37,6 +46,7 @@ export default function RootLayout() {
       <Stack.Screen name="book/[id]" />
       <Stack.Screen name="capture" options={{ presentation: 'modal' }} />
       <Stack.Screen name="log-progress" options={{ presentation: 'modal' }} />
+      <Stack.Screen name="search" options={{ presentation: 'modal' }} />
     </Stack>
   );
 }
