@@ -8,11 +8,13 @@ import {
   Image,
 } from 'react-native';
 import { useBooksStore } from '../../src/store/books';
+import { useRouter } from 'expo-router';
 import { Tag, FAB } from '../../src/components';
 import { Colors, Typography, FontFamily, Shadow, Radius } from '../../src/theme';
 
 export default function QuotesScreen() {
   const { quotes, books } = useBooksStore();
+  const router = useRouter();
 
   const bookMap = Object.fromEntries(books.map((b) => [b.id, b]));
 
@@ -60,7 +62,7 @@ export default function QuotesScreen() {
         <View style={{ height: 140 }} />
       </ScrollView>
 
-      <FAB onPress={() => {}} />
+      <FAB onPress={() => router.push('/capture')} />
     </SafeAreaView>
   );
 }

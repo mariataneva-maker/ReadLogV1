@@ -34,6 +34,8 @@ export default function RootLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="book/[id]" />
+      <Stack.Screen name="capture" options={{ presentation: 'modal' }} />
     </Stack>
   );
 }
