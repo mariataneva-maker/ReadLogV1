@@ -8,7 +8,9 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.mariataneva.readlog",
+      "appleTeamId": "38TN6Z4Q78"
     },
     "android": {
       "adaptiveIcon": {
@@ -21,6 +23,37 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "ReadLog uses the camera to read quotes from the page you are reading.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false
+        }
+      ],
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "ReadLog uses the microphone so you can read quotes aloud.",
+          "speechRecognitionPermission": "ReadLog turns what you read aloud into text."
+        }
+      ],
+      "expo-audio",
+      "expo-font",
+      "expo-splash-screen",
+      "expo-sqlite",
+      "expo-status-bar",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "enableSceneSupport": true
+          }
+        }
+      ]
+    ]
   }
 }

@@ -52,7 +52,7 @@ export default function NotesScreen() {
         <View style={{ height: 140 }} />
       </ScrollView>
 
-      <FAB onPress={() => router.push({ pathname: '/capture', params: { mode: 'note' } })} />
+      <FAB onPress={() => router.push({ pathname: '/capture', params: { kind: 'note' } })} />
     </SafeAreaView>
   );
 }

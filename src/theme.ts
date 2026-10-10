@@ -81,3 +81,20 @@ export const Shadow = {
     elevation: 16,
   },
 } as const;
+
+// New direction — mirrors the Figma "colour" variables (ReadLog — UI Screens).
+// Used by the capture flow first; the older tokens above stay until the rest is restyled.
+export const Palette = {
+  background: '#F5F2ED',
+  primary: '#6B1D2A',
+  secondary: '#D4645C',
+  mainText: '#2A2828',
+  secondaryText: '#7A6E6A',
+  subtleOutline: '#EAE6E1',
+  highlightOutline: '#B5493A',
+  buttonText: '#FFFFFF',
+  sheet: '#EAEBE6',
+  tag: '#9BABA4',
+  chipSelected: '#524E50',
+  camera: '#1F1D1D',
+} as const;

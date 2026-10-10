@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { db } from '../db';
 import { books as booksTable, quotes as quotesTable, notes as notesTable, readingSessions } from '../db/schema';
 import { eq } from 'drizzle-orm';
+import type { CaptureSource } from '../capture';
 
 export type ReadStatus = 'not_started' | 'reading' | 'completed';
 
@@ -27,6 +28,7 @@ export interface Quote {
   chapter: number;
   myNote?: string;
   tag?: string;
+  source?: CaptureSource;
   createdAt: string;
 }
 
@@ -36,6 +38,7 @@ export interface Note {
   text: string;
   page?: number;
   chapter?: number;
+  source?: CaptureSource;
   createdAt: string;
 }
 
@@ -76,6 +79,7 @@ function toQuote(row: typeof quotesTable.$inferSelect): Quote {
     chapter: row.chapter,
     myNote: row.myNote ?? undefined,
     tag: row.tag ?? undefined,
+    source: (row.source ?? undefined) as CaptureSource | undefined,
     createdAt: row.createdAt,
   };
 }
@@ -87,6 +91,7 @@ function toNote(row: typeof notesTable.$inferSelect): Note {
     text: row.text,
     page: row.page ?? undefined,
     chapter: row.chapter ?? undefined,
+    source: (row.source ?? undefined) as CaptureSource | undefined,
     createdAt: row.createdAt,
   };
 }
@@ -185,6 +190,7 @@ export const useBooksStore = create<BooksState>((set) => ({
       chapter: quote.chapter,
       myNote: quote.myNote,
       tag: quote.tag,
+      source: quote.source,
       createdAt: quote.createdAt,
     }).run();
     set((s) => ({ quotes: [...s.quotes, quote] }));
@@ -197,6 +203,7 @@ export const useBooksStore = create<BooksState>((set) => ({
       text: note.text,
       page: note.page,
       chapter: note.chapter,
+      source: note.source,
       createdAt: note.createdAt,
     }).run();
     set((s) => ({ notes: [...s.notes, note] }));

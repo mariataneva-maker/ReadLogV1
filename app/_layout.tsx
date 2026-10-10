@@ -15,6 +15,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { initDb } from '../src/db';
 import { seedIfEmpty } from '../src/db/seed';
 import { useBooksStore } from '../src/store/books';
+import { Palette } from '../src/theme';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -44,7 +45,19 @@ export default function RootLayout() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="book/[id]" />
-      <Stack.Screen name="capture" options={{ presentation: 'modal' }} />
+      <Stack.Screen
+        name="capture/index"
+        options={{
+          presentation: 'formSheet',
+          sheetAllowedDetents: 'fitToContents',
+          sheetGrabberVisible: true,
+          sheetCornerRadius: 28,
+          contentStyle: { backgroundColor: Palette.sheet },
+        }}
+      />
+      <Stack.Screen name="capture/snap" options={{ presentation: 'fullScreenModal' }} />
+      <Stack.Screen name="capture/speak" options={{ presentation: 'fullScreenModal' }} />
+      <Stack.Screen name="capture/save" options={{ presentation: 'fullScreenModal' }} />
       <Stack.Screen name="log-progress" options={{ presentation: 'modal' }} />
       <Stack.Screen name="search" options={{ presentation: 'modal' }} />
     </Stack>

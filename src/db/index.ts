@@ -50,4 +50,11 @@ export async function initDb() {
       created_at TEXT NOT NULL
     );
   `);
+
+  // Columns added after the first release — ALTER fails harmlessly once they exist.
+  for (const table of ['quotes', 'notes']) {
+    try {
+      sqlite.execSync(`ALTER TABLE ${table} ADD COLUMN source TEXT`);
+    } catch {}
+  }
 }

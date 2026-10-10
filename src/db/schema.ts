@@ -25,6 +25,7 @@ export const quotes = sqliteTable('quotes', {
   chapter: int('chapter').notNull().default(0),
   myNote: text('my_note'),
   tag: text('tag'),
+  source: text('source'), // snapped | spoken | typed
   createdAt: text('created_at').notNull(),
 });
 
@@ -34,6 +35,7 @@ export const notes = sqliteTable('notes', {
   text: text('text').notNull(),
   page: int('page'),
   chapter: int('chapter'),
+  source: text('source'),
   createdAt: text('created_at').notNull(),
 });
 
