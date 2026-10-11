@@ -85,15 +85,14 @@ const styles = StyleSheet.create({
   },
   today: { gap: 16 },
   question: { fontFamily: FontFamily.sans, fontSize: 20, lineHeight: 26, color: Palette.mainText, paddingHorizontal: 16 },
-  // Extra vertical room so the cards' shadows aren't clipped by the scroll view.
+  // Extra vertical room so the covers' shadows aren't clipped by the scroll view.
   carousel: { marginVertical: -16 },
-  carouselContent: { gap: 8, paddingHorizontal: 16, paddingVertical: 16 },
+  carouselContent: { gap: 12, paddingHorizontal: 16, paddingVertical: 16 },
+  // The shadow sits on the wrapper because a rounded image clips its own shadow.
   readingCard: {
-    width: 111, height: 162, borderRadius: 16, paddingTop: 16, paddingLeft: 16,
-    backgroundColor: 'rgba(255,255,255,0.55)',
-    shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.12, shadowRadius: 20,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.22, shadowRadius: 12,
   },
-  readingCover: { width: 95, height: 146, borderBottomRightRadius: 16, backgroundColor: Palette.subtleOutline },
+  readingCover: { width: 108, height: 162, borderRadius: 4, backgroundColor: Palette.subtleOutline },
   chips: { flexDirection: 'row', gap: 8, paddingHorizontal: 16, marginBottom: -8 },
   list: { gap: 16, paddingHorizontal: 16 },
   empty: { fontFamily: FontFamily.sans, fontSize: 14, color: Palette.secondaryText },
