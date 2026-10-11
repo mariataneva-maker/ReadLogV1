@@ -1,254 +1,100 @@
+// Home — Figma frame "Home" (18:944).
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
-  SafeAreaView,
-  TouchableOpacity,
-  Image,
-} from 'react-native';
+import { View, Text, Image, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { useBooksStore, Book } from '../../src/store/books';
-import { BookCover, Pill, ProgressBar, FAB } from '../../src/components';
-import { Colors, Typography, FontFamily, Shadow, Radius } from '../../src/theme';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useBooksStore, type ReadStatus } from '../../src/store/books';
+import { Chip } from '../../src/components/ui';
+import { BookCard, FABMenu } from '../../src/components';
+import { Palette, FontFamily } from '../../src/theme';
 
-type FilterStatus = 'not_started' | 'reading' | 'completed';
+const FILTERS: { status: ReadStatus; label: string }[] = [
+  { status: 'reading', label: 'Reading' },
+  { status: 'completed', label: 'Finished' },
+  { status: 'not_started', label: 'Want to read' },
+];
 
-export default function LibraryScreen() {
-  const { books } = useBooksStore();
-  const [filter, setFilter] = useState<FilterStatus>('reading');
+export default function HomeScreen() {
   const router = useRouter();
-
-  const filtered = books.filter((b) => b.status === filter);
+  const books = useBooksStore((s) => s.books);
+  const [status, setStatus] = useState<ReadStatus>('reading');
   const reading = books.filter((b) => b.status === 'reading');
-  const featured = reading[0];
+  const shown = books.filter((b) => b.status === status);
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Header */}
+    <SafeAreaView style={styles.screen} edges={['top']}>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <Text style={styles.title}>Library</Text>
-          <TouchableOpacity style={styles.addBtn} activeOpacity={0.7} onPress={() => router.push('/search')}>
-            <Text style={styles.addBtnText}>+ Add book</Text>
-          </TouchableOpacity>
+          <Text style={styles.title}>Home</Text>
+          {/* Profile isn't built yet; the button is here to match the design. */}
+          <View style={styles.profile} accessibilityLabel="Profile">
+            <MaterialCommunityIcons name="account-outline" size={28} color={Palette.buttonText} />
+          </View>
         </View>
 
-        {/* Filter pills */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.pillsRow}
-          contentContainerStyle={styles.pillsContent}
-        >
-          {(['not_started', 'reading', 'completed'] as FilterStatus[]).map((s) => (
-            <Pill
-              key={s}
-              label={s === 'not_started' ? 'Not started' : s === 'reading' ? 'Reading' : 'Completed'}
-              active={filter === s}
-              onPress={() => setFilter(s)}
-              style={{ marginRight: 8 }}
-            />
-          ))}
-        </ScrollView>
-
-        {/* Currently reading carousel */}
-        {filter === 'reading' && reading.length > 0 && (
-          <>
-            <Text style={[styles.sectionLabel, Typography.meta]}>Currently reading</Text>
-            <BookStack books={reading} />
-            {featured && (
-              <View style={styles.featuredInfo}>
-                <Text style={styles.featuredTitle}>{featured.title}</Text>
-                <Text style={[Typography.body, { color: Colors.grey, marginTop: 6 }]}>
-                  {featured.author}
-                </Text>
-                <ProgressBar
-                  progress={featured.currentPage / featured.totalPages}
-                  height={3}
-                  style={{ marginTop: 14, width: 180, alignSelf: 'center' }}
-                />
-                <Text style={[Typography.meta, { marginTop: 10 }]}>
-                  Page {featured.currentPage} of {featured.totalPages} ·{' '}
-                  {Math.round((featured.currentPage / featured.totalPages) * 100)}%
-                </Text>
-              </View>
-            )}
-            <DotIndicator count={reading.length} active={0} />
-          </>
+        {reading.length > 0 && (
+          <View style={styles.today}>
+            <Text style={styles.question}>What did you read today?</Text>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}
+              style={styles.carousel} contentContainerStyle={styles.carouselContent}>
+              {reading.map((book) => (
+                <Pressable key={book.id} accessibilityLabel={`Add a quote from ${book.title}`}
+                  onPress={() => router.push({ pathname: '/capture', params: { bookId: book.id } })}
+                  style={({ pressed }) => [styles.readingCard, pressed && { opacity: 0.8 }]}>
+                  {book.coverUrl
+                    ? <Image source={{ uri: book.coverUrl }} style={styles.readingCover} />
+                    : <View style={styles.readingCover} />}
+                </Pressable>
+              ))}
+            </ScrollView>
+          </View>
         )}
 
-        {/* Book list */}
-        <View style={styles.list}>
-          <Text style={[Typography.meta, styles.listLabel]}>
-            {filter === 'reading' ? 'All reading' : filter === 'completed' ? 'Completed' : 'Not started'} · {filtered.length}
-          </Text>
-          {filtered.map((book) => (
-            <BookCard key={book.id} book={book} />
+        <View style={styles.chips}>
+          {FILTERS.map((f) => (
+            <Chip key={f.status} label={f.label} selected={status === f.status} onPress={() => setStatus(f.status)} />
           ))}
         </View>
 
-        <View style={{ height: 140 }} />
+        <View style={styles.list}>
+          {shown.map((book) => (
+            <BookCard key={book.id} book={book} onPress={() => router.push(`/book/${book.id}`)} />
+          ))}
+          {shown.length === 0 && <Text style={styles.empty}>Nothing here yet.</Text>}
+        </View>
       </ScrollView>
 
-      <FAB onPress={() => router.push('/capture')} />
+      <FABMenu actions={[
+        { label: 'Add book', icon: 'book-outline', onPress: () => router.push('/search') },
+        { label: 'Add quote', icon: 'format-quote-close', onPress: () => router.push('/capture') },
+        { label: 'Add note', icon: 'note-edit-outline', onPress: () => router.push({ pathname: '/capture', params: { kind: 'note' } }) },
+      ]} />
     </SafeAreaView>
   );
 }
 
-function BookStack({ books }: { books: Book[] }) {
-  const [b1, b2, b3] = books;
-  return (
-    <View style={styles.stack}>
-      {b3 && (
-        <Image
-          source={{ uri: b3.coverUrl ?? undefined }}
-          style={[styles.stackCover, styles.stackBack]}
-        />
-      )}
-      {b2 && (
-        <Image
-          source={{ uri: b2.coverUrl ?? undefined }}
-          style={[styles.stackCover, styles.stackMid]}
-        />
-      )}
-      {b1 && (
-        <Image
-          source={{ uri: b1.coverUrl ?? undefined }}
-          style={[styles.stackCover, styles.stackFront]}
-        />
-      )}
-    </View>
-  );
-}
-
-function DotIndicator({ count, active }: { count: number; active: number }) {
-  return (
-    <View style={styles.dots}>
-      {Array.from({ length: count }).map((_, i) => (
-        <View key={i} style={[styles.dot, i === active && styles.dotActive]} />
-      ))}
-    </View>
-  );
-}
-
-function BookCard({ book }: { book: Book }) {
-  const router = useRouter();
-  return (
-    <TouchableOpacity style={styles.card} activeOpacity={0.75} onPress={() => router.push(`/book/${book.id}`)}>
-      <BookCover uri={book.coverUrl} size="sm" />
-      <View style={styles.cardInfo}>
-        <Text style={styles.cardTitle} numberOfLines={2}>
-          {book.title}
-        </Text>
-        <Text style={[Typography.meta, { marginTop: 5 }]}>{book.author}</Text>
-        <ProgressBar
-          progress={book.currentPage / book.totalPages}
-          height={3}
-          style={{ marginTop: 10 }}
-        />
-        <Text style={[Typography.meta, { marginTop: 7, color: Colors.faint }]}>
-          Page {book.currentPage} of {book.totalPages}
-        </Text>
-      </View>
-    </TouchableOpacity>
-  );
-}
-
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.paper },
-  scroll: { flex: 1 },
-  content: { paddingTop: 4 },
-
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 24,
-    paddingTop: 4,
+  screen: { flex: 1, backgroundColor: Palette.background },
+  content: { paddingTop: 8, paddingBottom: 180, gap: 32 },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16 },
+  title: { fontFamily: FontFamily.sansSemiBold, fontSize: 36, color: Palette.mainText },
+  profile: {
+    width: 56, height: 56, borderRadius: 28, backgroundColor: Palette.secondary,
+    alignItems: 'center', justifyContent: 'center',
   },
-  title: {
-    ...Typography.display,
-    fontSize: 30,
+  today: { gap: 16 },
+  question: { fontFamily: FontFamily.sans, fontSize: 20, lineHeight: 26, color: Palette.mainText, paddingHorizontal: 16 },
+  // Extra vertical room so the cards' shadows aren't clipped by the scroll view.
+  carousel: { marginVertical: -16 },
+  carouselContent: { gap: 8, paddingHorizontal: 16, paddingVertical: 16 },
+  readingCard: {
+    width: 111, height: 162, borderRadius: 16, paddingTop: 16, paddingLeft: 16,
+    backgroundColor: 'rgba(255,255,255,0.55)',
+    shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.12, shadowRadius: 20,
   },
-  addBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    borderWidth: 1,
-    borderColor: Colors.line,
-    backgroundColor: Colors.surface,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: Radius.full,
-  },
-  addBtnText: {
-    fontFamily: FontFamily.sansSemiBold,
-    fontSize: 14,
-    color: Colors.pine,
-  },
-
-  pillsRow: { marginTop: 20 },
-  pillsContent: { paddingHorizontal: 24 },
-
-  sectionLabel: {
-    paddingHorizontal: 24,
-    marginTop: 28,
-  },
-
-  // stacked covers
-  stack: {
-    height: 248,
-    marginTop: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-  },
-  stackCover: {
-    position: 'absolute',
-    width: 158,
-    height: 236,
-    borderRadius: Radius.sm,
-    borderWidth: 1,
-    borderColor: 'rgba(0,0,0,0.06)',
-    ...Shadow.cover,
-  },
-  stackFront: { transform: [{ translateX: 0 }], zIndex: 3 },
-  stackMid: { transform: [{ translateX: -115 }, { rotate: '-8deg' }, { scale: 0.86 }], zIndex: 2 },
-  stackBack: { transform: [{ translateX: 115 }, { rotate: '8deg' }, { scale: 0.86 }], zIndex: 1 },
-
-  featuredInfo: { alignItems: 'center', marginTop: 10 },
-  featuredTitle: { ...Typography.display, fontSize: 18, textAlign: 'center' },
-
-  dots: { flexDirection: 'row', gap: 6, justifyContent: 'center', marginTop: 14 },
-  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: Colors.faint },
-  dotActive: { backgroundColor: Colors.pine },
-
-  list: { paddingHorizontal: 24, marginTop: 30 },
-  listLabel: { color: Colors.faint, marginBottom: 14 },
-
-  card: {
-    backgroundColor: Colors.surface,
-    borderWidth: 1,
-    borderColor: Colors.line,
-    borderRadius: Radius.md,
-    padding: 14,
-    flexDirection: 'row',
-    gap: 14,
-    marginBottom: 14,
-    alignItems: 'center',
-    ...Shadow.card,
-  },
-  cardInfo: { flex: 1 },
-  cardTitle: {
-    fontFamily: FontFamily.serif,
-    fontSize: 18,
-    lineHeight: 22,
-    color: Colors.ink,
-  },
+  readingCover: { width: 95, height: 146, borderBottomRightRadius: 16, backgroundColor: Palette.subtleOutline },
+  chips: { flexDirection: 'row', gap: 8, paddingHorizontal: 16, marginBottom: -8 },
+  list: { gap: 16, paddingHorizontal: 16 },
+  empty: { fontFamily: FontFamily.sans, fontSize: 14, color: Palette.secondaryText },
 });

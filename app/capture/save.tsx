@@ -1,12 +1,13 @@
 // Capture / 5 · Save details — the last step for Snap, Speak and Type.
 import React, { useMemo, useState } from 'react';
 import {
-  View, Text, TextInput, Image, Pressable, ScrollView, StyleSheet, KeyboardAvoidingView, Platform,
+  View, Text, TextInput, Pressable, ScrollView, StyleSheet, KeyboardAvoidingView, Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams } from 'expo-router';
 import * as Haptics from 'expo-haptics';
-import { useBooksStore, type Book } from '../../src/store/books';
+import { useBooksStore } from '../../src/store/books';
+import { BookCard } from '../../src/components';
 import { Button, Chip, TagChip, SheetHeader, FieldLabel, ui } from '../../src/components/ui';
 import { closeCapture, pickBook, type CaptureParams, type CaptureSource } from '../../src/capture';
 import { Palette, FontFamily } from '../../src/theme';
@@ -78,9 +79,9 @@ export default function SaveCaptureScreen() {
 
           <View>
             <FieldLabel>Book</FieldLabel>
-            {book && <BookRow book={book} onPress={() => setPicking((p) => !p)} />}
+            {book && <BookCard book={book} onPress={() => setPicking((p) => !p)} />}
             {picking && books.filter((b) => b.id !== bookId).map((b) => (
-              <BookRow key={b.id} book={b} onPress={() => { setBookId(b.id); setPicking(false); }} style={{ marginTop: 8 }} />
+              <BookCard key={b.id} book={b} onPress={() => { setBookId(b.id); setPicking(false); }} style={{ marginTop: 8 }} />
             ))}
           </View>
 
@@ -137,20 +138,6 @@ export default function SaveCaptureScreen() {
   );
 }
 
-function BookRow({ book, onPress, style }: { book: Book; onPress: () => void; style?: object }) {
-  const progress = book.totalPages ? Math.min(1, book.currentPage / book.totalPages) : 0;
-  return (
-    <Pressable onPress={onPress} style={({ pressed }) => [styles.book, style, pressed && { opacity: 0.7 }]}>
-      {book.coverUrl ? <Image source={{ uri: book.coverUrl }} style={styles.cover} /> : <View style={styles.cover} />}
-      <View style={{ flex: 1 }}>
-        <Text style={styles.bookTitle} numberOfLines={1}>{book.title}</Text>
-        <Text style={ui.meta} numberOfLines={1}>{book.author}</Text>
-        <View style={styles.track}><View style={[styles.fill, { width: `${progress * 100}%` }]} /></View>
-      </View>
-    </Pressable>
-  );
-}
-
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: Palette.background },
   content: { padding: 16, gap: 16 },
@@ -163,13 +150,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16, paddingVertical: 8, borderRadius: 999,
     backgroundColor: Palette.buttonText, borderWidth: 1, borderColor: Palette.highlightOutline,
   },
-  book: {
-    flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12,
-    backgroundColor: Palette.buttonText, borderRadius: 16,
-  },
-  cover: { width: 44, height: 64, borderRadius: 4, backgroundColor: Palette.subtleOutline },
-  bookTitle: { fontFamily: FontFamily.sans, fontSize: 16, color: Palette.mainText },
-  track: { height: 4, borderRadius: 2, backgroundColor: Palette.subtleOutline, marginTop: 10 },
-  fill: { height: 4, borderRadius: 2, backgroundColor: Palette.secondary },
   save: { marginHorizontal: 16, marginBottom: 16, marginTop: 8 },
 });

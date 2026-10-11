@@ -50,6 +50,7 @@ interface BooksState {
   loadAll: () => void;
   addBook: (book: Book) => void;
   updateProgress: (bookId: string, page: number) => void;
+  setStatus: (bookId: string, status: ReadStatus) => void;
   addQuote: (quote: Quote) => void;
   addNote: (note: Note) => void;
 }
@@ -179,6 +180,19 @@ export const useBooksStore = create<BooksState>((set) => ({
       books: s.books.map((b) => (b.id === bookId ? { ...b, currentPage: page } : b)),
       streak,
     }));
+  },
+
+  setStatus: (bookId, status) => {
+    const today = new Date().toISOString().slice(0, 10);
+    db.update(booksTable)
+      .set({
+        status,
+        ...(status === 'reading' && { dateStarted: today }),
+        ...(status === 'completed' && { dateFinished: today }),
+      })
+      .where(eq(booksTable.id, bookId))
+      .run();
+    set((s) => ({ books: s.books.map((b) => (b.id === bookId ? { ...b, status } : b)) }));
   },
 
   addQuote: (quote) => {

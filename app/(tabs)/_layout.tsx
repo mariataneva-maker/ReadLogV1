@@ -1,178 +1,45 @@
-import { Tabs } from 'expo-router';
-import { View, Text, StyleSheet } from 'react-native';
-import { Colors, FontFamily, Shadow } from '../../src/theme';
+// Tab bar — the Figma "Menu" component (Home · Library · Notes · Quotes).
+// Native tabs, so iOS draws it as a floating Liquid Glass bar. Icons are exported
+// from the Figma icon components (assets/tab-icons) to keep their line weight.
+import { NativeTabs } from 'expo-router/unstable-native-tabs';
+import { Palette, FontFamily } from '../../src/theme';
 
-function TabIcon({
-  focused,
-  icon,
-  label,
-}: {
-  focused: boolean;
-  icon: React.ReactNode;
-  label: string;
-}) {
-  return (
-    <View style={[styles.tabItem, focused && styles.tabItemActive]}>
-      <View style={{ opacity: focused ? 1 : 0.55 }}>{icon}</View>
-      <Text style={[styles.tabLabel, focused && styles.tabLabelActive]}>{label}</Text>
-    </View>
-  );
-}
-
-// SVG-free icon components using just Views
-function LibraryIcon({ color }: { color: string }) {
-  return (
-    <View style={{ width: 22, height: 22, alignItems: 'center', justifyContent: 'center' }}>
-      <View style={[styles.bookIcon, { borderColor: color }]}>
-        <View style={[styles.bookSpine, { backgroundColor: color }]} />
-      </View>
-    </View>
-  );
-}
-
-function QuoteIcon({ color }: { color: string }) {
-  return (
-    <View style={{ width: 22, height: 22, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 3 }}>
-      <View style={[styles.quoteMark, { backgroundColor: color }]} />
-      <View style={[styles.quoteMark, { backgroundColor: color }]} />
-    </View>
-  );
-}
-
-function NotesIcon({ color }: { color: string }) {
-  return (
-    <View style={{ width: 22, height: 22, alignItems: 'center', justifyContent: 'center' }}>
-      <View style={[styles.noteLines]}>
-        <View style={[styles.noteLine, { backgroundColor: color, width: 14 }]} />
-        <View style={[styles.noteLine, { backgroundColor: color, width: 10 }]} />
-        <View style={[styles.noteLine, { backgroundColor: color, width: 12 }]} />
-      </View>
-    </View>
-  );
-}
+const TABS = [
+  {
+    name: 'index', label: 'Home',
+    icon: require('../../assets/tab-icons/home.png'),
+    selectedIcon: require('../../assets/tab-icons/home-filled.png'),
+  },
+  {
+    name: 'library', label: 'Library',
+    icon: require('../../assets/tab-icons/library.png'),
+    selectedIcon: require('../../assets/tab-icons/library-filled.png'),
+  },
+  {
+    name: 'notes', label: 'Notes',
+    icon: require('../../assets/tab-icons/notes.png'),
+    selectedIcon: require('../../assets/tab-icons/notes-filled.png'),
+  },
+  {
+    name: 'quotes', label: 'Quotes',
+    icon: require('../../assets/tab-icons/quotes.png'),
+    selectedIcon: require('../../assets/tab-icons/quotes-filled.png'),
+  },
+];
 
 export default function TabsLayout() {
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarStyle: styles.tabBar,
-        tabBarShowLabel: false,
-        tabBarItemStyle: styles.tabBarItem,
-      }}
+    <NativeTabs
+      tintColor={Palette.highlightOutline}
+      iconColor={{ default: Palette.mainText, selected: Palette.highlightOutline }}
+      labelStyle={{ fontFamily: FontFamily.sans, color: Palette.mainText }}
     >
-      <Tabs.Screen
-        name="index"
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <TabIcon
-              focused={focused}
-              icon={<LibraryIcon color={focused ? Colors.pine : Colors.faint} />}
-              label="Library"
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="quotes"
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <TabIcon
-              focused={focused}
-              icon={<QuoteIcon color={focused ? Colors.pine : Colors.faint} />}
-              label="Quotes"
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="notes"
-        options={{
-          tabBarIcon: ({ focused }) => (
-            <TabIcon
-              focused={focused}
-              icon={<NotesIcon color={focused ? Colors.pine : Colors.faint} />}
-              label="Notes"
-            />
-          ),
-        }}
-      />
-    </Tabs>
+      {TABS.map((tab) => (
+        <NativeTabs.Trigger key={tab.name} name={tab.name}>
+          <NativeTabs.Trigger.Icon src={{ default: tab.icon, selected: tab.selectedIcon }} renderingMode="template" />
+          <NativeTabs.Trigger.Label>{tab.label}</NativeTabs.Trigger.Label>
+        </NativeTabs.Trigger>
+      ))}
+    </NativeTabs>
   );
 }
-
-const styles = StyleSheet.create({
-  tabBar: {
-    position: 'absolute',
-    bottom: 22,
-    left: 40,
-    right: 40,
-    height: 68,
-    borderRadius: 26,
-    borderWidth: 1,
-    borderColor: Colors.line,
-    backgroundColor: Colors.surface,
-    paddingBottom: 0,
-    paddingTop: 0,
-    overflow: 'hidden',
-    ...Shadow.tabbar,
-  },
-  tabBarItem: {
-    flex: 1,
-    height: 68,
-    maxHeight: 68,
-    paddingTop: 0,
-    paddingBottom: 0,
-    marginTop: 0,
-    marginBottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  tabItem: {
-    alignItems: 'center',
-    gap: 3,
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-    borderRadius: 19,
-  },
-  tabItemActive: {
-    backgroundColor: Colors.tint,
-  },
-  tabLabel: {
-    fontFamily: FontFamily.sansSemiBold,
-    fontSize: 11,
-    color: Colors.faint,
-  },
-  tabLabelActive: {
-    color: Colors.pine,
-  },
-  // book icon
-  bookIcon: {
-    width: 16,
-    height: 18,
-    borderWidth: 1.5,
-    borderRadius: 2,
-    overflow: 'hidden',
-  },
-  bookSpine: {
-    position: 'absolute',
-    left: 4,
-    top: 0,
-    bottom: 0,
-    width: 1,
-  },
-  // quote icon
-  quoteMark: {
-    width: 6,
-    height: 9,
-    borderRadius: 3,
-  },
-  // notes icon
-  noteLines: {
-    gap: 3,
-  },
-  noteLine: {
-    height: 2,
-    borderRadius: 1,
-  },
-});

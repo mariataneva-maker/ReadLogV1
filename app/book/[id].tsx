@@ -1,223 +1,181 @@
+// Book detail — Figma frames "Book detail" (22:517), "Book detail not reading" (26:587)
+// and "Book quotes" (26:697).
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
-  SafeAreaView,
-  TouchableOpacity,
-  Image,
-} from 'react-native';
+import { View, Text, Image, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useBooksStore, Quote, Note } from '../../src/store/books';
-import { BookCover, Tag, ProgressBar, FAB } from '../../src/components';
-import { Colors, Typography, FontFamily, Radius, Shadow } from '../../src/theme';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useBooksStore, type Book } from '../../src/store/books';
+import { Button, type IconName } from '../../src/components/ui';
+import { Entry } from '../../src/components/Entry';
+import { Palette, FontFamily } from '../../src/theme';
 
-type Tab = 'info' | 'quotes' | 'notes';
+type Section = 'overview' | 'quotes' | 'notes';
+
+const SECTIONS: { key: Section; label: string; icon: IconName }[] = [
+  { key: 'overview', label: 'Overview', icon: 'card-text-outline' },
+  { key: 'quotes', label: 'Quotes', icon: 'format-quote-close' },
+  { key: 'notes', label: 'Notes', icon: 'note-edit-outline' },
+];
+
+// Genre chips get a steady colour per genre, like the varied chips in the Figma frames.
+const GENRE_COLOURS = ['#6DA34D', '#D95F2C', '#4F7CAC', '#9B5DA8', '#C4504A', '#3E8E86'];
+function genreColour(genre: string) {
+  let h = 0;
+  for (const c of genre) h = (h * 31 + c.charCodeAt(0)) >>> 0;
+  return GENRE_COLOURS[h % GENRE_COLOURS.length];
+}
+
+const MUTED = '#6B7C74';
 
 export default function BookDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const { books, quotes, notes, streak } = useBooksStore();
-  const [tab, setTab] = useState<Tab>('quotes');
+  const { books, quotes, notes, setStatus } = useBooksStore();
+  const [section, setSection] = useState<Section>('overview');
 
   const book = books.find((b) => b.id === id);
   if (!book) return null;
 
   const bookQuotes = quotes.filter((q) => q.bookId === id);
   const bookNotes = notes.filter((n) => n.bookId === id);
-  const pct = Math.round((book.currentPage / book.totalPages) * 100);
+  const onShelf = book.status !== 'not_started';
+  const progress = book.totalPages ? Math.min(1, book.currentPage / book.totalPages) : 0;
 
   return (
-    <SafeAreaView style={styles.safe}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {/* Nav */}
-        <View style={styles.nav}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backBtn} activeOpacity={0.7}>
-            <BackIcon />
-          </TouchableOpacity>
-          <View style={styles.moreBtn}>
-            <DotsIcon />
-          </View>
-        </View>
+    <SafeAreaView style={styles.screen} edges={['top']}>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
+        <Pressable onPress={() => router.back()} hitSlop={8} accessibilityLabel="Back" style={styles.back}>
+          <MaterialCommunityIcons name="arrow-left" size={28} color={Palette.mainText} />
+        </Pressable>
 
-        {/* Hero */}
         <View style={styles.hero}>
-          <BookCover uri={book.coverUrl} size="lg" />
-          <Text style={styles.title}>{book.title}</Text>
-          <Text style={[Typography.body, styles.author]}>{book.author}</Text>
-          <View style={styles.chips}>
-            <View style={styles.genreChip}><Text style={styles.genreText}>{book.genre}</Text></View>
-            <Text style={styles.stars}>{'★'.repeat(book.rating) + '☆'.repeat(5 - book.rating)}</Text>
+          {book.coverUrl ? <Image source={{ uri: book.coverUrl }} style={styles.cover} /> : <View style={styles.cover} />}
+          <View>
+            <Text style={styles.title}>{book.title}</Text>
+            <Text style={styles.author}>{book.author}</Text>
+          </View>
+          <View style={styles.meta}>
+            {book.genre ? (
+              <View style={[styles.genre, { backgroundColor: genreColour(book.genre) }]}>
+                <Text style={styles.genreLabel}>{book.genre}</Text>
+              </View>
+            ) : null}
+            <Stars rating={book.rating} />
           </View>
         </View>
 
-        {/* Progress */}
-        <View style={styles.progSection}>
-          <View style={styles.progRow}>
-            <Text style={Typography.meta}>Progress</Text>
-            <Text style={Typography.meta}>{streak > 0 ? `${streak}-day streak` : 'No streak yet'}</Text>
-          </View>
-          <ProgressBar progress={book.currentPage / book.totalPages} height={3} style={{ marginTop: 12 }} />
-          <Text style={[Typography.meta, { marginTop: 11 }]}>
-            Page {book.currentPage} of {book.totalPages} · {pct}% · Chapter {book.currentChapter} of {book.totalChapters}
-          </Text>
-        </View>
-
-        {/* CTA */}
-        <TouchableOpacity
-          style={styles.cta}
-          activeOpacity={0.85}
-          onPress={() => router.push({ pathname: '/log-progress', params: { bookId: id } })}
-        >
-          <Text style={styles.ctaText}>Log reading</Text>
-        </TouchableOpacity>
-
-        {/* Tabs */}
-        <View style={styles.tabs}>
-          {(['info', 'quotes', 'notes'] as Tab[]).map((t) => (
-            <TouchableOpacity key={t} onPress={() => setTab(t)} style={styles.tabBtn} activeOpacity={0.7}>
-              <Text style={[styles.tabLabel, tab === t && styles.tabLabelOn]}>
-                {t === 'info' ? 'Book info' : t === 'quotes' ? `Quotes ${bookQuotes.length}` : `Notes ${bookNotes.length}`}
+        {onShelf && (
+          <View style={styles.progress}>
+            <View style={styles.progressRow}>
+              <Text style={styles.body}>Progress</Text>
+              <Text style={styles.muted}>
+                Page {book.currentPage} of {book.totalPages} • {Math.round(progress * 100)}%
               </Text>
-              {tab === t && <View style={styles.tabUnderline} />}
-            </TouchableOpacity>
+            </View>
+            <View style={styles.track}><View style={[styles.fill, { width: `${progress * 100}%` }]} /></View>
+          </View>
+        )}
+
+        <View style={styles.actions}>
+          {onShelf ? (
+            <>
+              <Button label="Update progress" style={{ flex: 1 }}
+                onPress={() => router.push({ pathname: '/log-progress', params: { bookId: book.id } })} />
+              <Pressable accessibilityLabel={`Add a quote or note to ${book.title}`} style={styles.add}
+                onPress={() => router.push({ pathname: '/capture', params: { bookId: book.id } })}>
+                <MaterialCommunityIcons name="plus" size={28} color={Palette.buttonText} />
+              </Pressable>
+            </>
+          ) : (
+            <Button label="Add to shelf" style={{ flex: 1 }} onPress={() => setStatus(book.id, 'reading')} />
+          )}
+        </View>
+
+        <View style={styles.segments}>
+          {SECTIONS.map((s) => (
+            <Pressable key={s.key} onPress={() => setSection(s.key)} accessibilityState={{ selected: section === s.key }}
+              style={[styles.segment, section === s.key && styles.segmentOn]}>
+              <MaterialCommunityIcons name={s.icon} size={20} color={Palette.mainText} />
+              <Text style={styles.segmentLabel}>{s.label}</Text>
+            </Pressable>
           ))}
         </View>
 
-        {/* Tab content */}
-        {tab === 'quotes' && (
-          <View>
-            {bookQuotes.length === 0 ? (
-              <View style={styles.empty}>
-                <Text style={Typography.meta}>No quotes yet — tap + to add one.</Text>
-              </View>
-            ) : (
-              bookQuotes.map((q) => <QuoteRow key={q.id} quote={q} />)
-            )}
-          </View>
+        {section === 'overview' && <Overview book={book} />}
+        {section === 'quotes' && (
+          bookQuotes.length
+            ? bookQuotes.map((q) => <Entry key={q.id} entry={q} />)
+            : <Text style={styles.muted}>No quotes yet. Tap + to add one.</Text>
         )}
-        {tab === 'notes' && (
-          <View>
-            {bookNotes.length === 0 ? (
-              <View style={styles.empty}>
-                <Text style={Typography.meta}>No notes yet — tap + to add one.</Text>
-              </View>
-            ) : (
-              bookNotes.map((n) => <NoteRow key={n.id} note={n} />)
-            )}
-          </View>
+        {section === 'notes' && (
+          bookNotes.length
+            ? bookNotes.map((n) => <Entry key={n.id} entry={n} />)
+            : <Text style={styles.muted}>No notes yet. Tap + to add one.</Text>
         )}
-        {tab === 'info' && (
-          <View style={styles.infoSection}>
-            <InfoRow label="Genre" value={book.genre} />
-            <InfoRow label="Total pages" value={String(book.totalPages)} />
-            <InfoRow label="Chapters" value={String(book.totalChapters)} />
-            <InfoRow label="Rating" value={'★'.repeat(book.rating) + '☆'.repeat(5 - book.rating)} />
-          </View>
-        )}
-
-        <View style={{ height: 140 }} />
       </ScrollView>
-
-      <FAB onPress={() => router.push({ pathname: '/capture', params: { bookId: id } })} />
     </SafeAreaView>
   );
 }
 
-function NoteRow({ note }: { note: Note }) {
+function Stars({ rating }: { rating: number }) {
   return (
-    <View style={styles.quoteRow}>
-      <Text style={[styles.quoteText, { fontSize: 16, lineHeight: 24 }]}>{note.text}</Text>
-      <View style={styles.quoteMeta}>
-        <Text style={Typography.meta}>
-          {note.page ? `Page ${note.page}` : ''}{note.chapter ? ` · Chapter ${note.chapter}` : ''}
-        </Text>
-      </View>
+    <View style={styles.stars} accessibilityLabel={`${rating} out of 5 stars`}>
+      {[1, 2, 3, 4, 5].map((i) => (
+        <MaterialCommunityIcons key={i} size={22} color={Palette.mainText}
+          name={rating >= i ? 'star' : rating >= i - 0.5 ? 'star-half-full' : 'star-outline'} />
+      ))}
     </View>
   );
 }
 
-function QuoteRow({ quote }: { quote: Quote }) {
+function Overview({ book }: { book: Book }) {
+  const facts = [
+    ['Pages', book.totalPages ? String(book.totalPages) : '—'],
+    ['Chapters', book.totalChapters ? String(book.totalChapters) : '—'],
+  ];
   return (
-    <View style={styles.quoteRow}>
-      <Text style={styles.quoteText}>{quote.text}</Text>
-      <View style={styles.quoteMeta}>
-        <Text style={Typography.meta}>Page {quote.page} · Chapter {quote.chapter}</Text>
-        {quote.tag && <Tag label={quote.tag} />}
-      </View>
-    </View>
-  );
-}
-
-function InfoRow({ label, value }: { label: string; value: string }) {
-  return (
-    <View style={styles.infoRow}>
-      <Text style={Typography.meta}>{label}</Text>
-      <Text style={[Typography.body, { color: Colors.ink }]}>{value}</Text>
-    </View>
-  );
-}
-
-function BackIcon() {
-  return (
-    <View style={{ width: 20, height: 20, justifyContent: 'center' }}>
-      <View style={[styles.chevron, { transform: [{ rotate: '45deg' }, { translateX: 3 }] }]} />
-      <View style={[styles.chevronBottom, { transform: [{ rotate: '-45deg' }, { translateX: 3 }] }]} />
-    </View>
-  );
-}
-
-function DotsIcon() {
-  return (
-    <View style={{ flexDirection: 'row', gap: 4, alignItems: 'center' }}>
-      {[0, 1, 2].map((i) => (
-        <View key={i} style={styles.dot} />
+    <View style={styles.facts}>
+      {facts.map(([label, value]) => (
+        <View key={label} style={{ flex: 1 }}>
+          <Text style={styles.factLabel}>{label}</Text>
+          <Text style={styles.body}>{value}</Text>
+        </View>
       ))}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: Colors.paper },
-
-  nav: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, paddingTop: 8 },
-  backBtn: { padding: 8 },
-  moreBtn: { padding: 8 },
-
-  hero: { alignItems: 'center', paddingHorizontal: 24, paddingTop: 8, paddingBottom: 8 },
-  title: { fontFamily: FontFamily.serif, fontSize: 29, lineHeight: 32, color: Colors.ink, textAlign: 'center', marginTop: 24 },
-  author: { color: Colors.grey, marginTop: 8 },
-  chips: { flexDirection: 'row', gap: 10, marginTop: 16, alignItems: 'center' },
-  genreChip: { borderWidth: 1, borderColor: Colors.line, paddingHorizontal: 13, paddingVertical: 5, borderRadius: Radius.full },
-  genreText: { fontFamily: FontFamily.sansMedium, fontSize: 13, color: Colors.ink },
-  stars: { fontSize: 14, color: Colors.pine, letterSpacing: 1 },
-
-  progSection: { marginHorizontal: 24, marginTop: 30 },
-  progRow: { flexDirection: 'row', justifyContent: 'space-between' },
-
-  cta: {
-    marginHorizontal: 24, marginTop: 22, height: 50, borderRadius: Radius.full,
-    backgroundColor: Colors.pine, alignItems: 'center', justifyContent: 'center',
+  screen: { flex: 1, backgroundColor: Palette.background },
+  content: { paddingHorizontal: 16, paddingBottom: 140, gap: 24 },
+  back: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center', marginTop: 8, marginLeft: -8 },
+  hero: { alignItems: 'center', gap: 16, marginTop: -16 },
+  cover: {
+    width: 135, height: 206, backgroundColor: Palette.subtleOutline,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.4, shadowRadius: 20,
   },
-  ctaText: { fontFamily: FontFamily.sansSemiBold, fontSize: 15, color: Colors.cream },
-
-  tabs: { flexDirection: 'row', gap: 26, justifyContent: 'center', marginTop: 30, marginHorizontal: 24, borderBottomWidth: 1, borderBottomColor: Colors.line },
-  tabBtn: { paddingBottom: 13, position: 'relative' },
-  tabLabel: { fontFamily: FontFamily.sansMedium, fontSize: 15, color: Colors.grey },
-  tabLabelOn: { color: Colors.ink },
-  tabUnderline: { position: 'absolute', bottom: -1, left: 0, right: 0, height: 2, backgroundColor: Colors.pine },
-
-  quoteRow: { padding: 24, borderBottomWidth: 1, borderBottomColor: Colors.line },
-  quoteText: { fontFamily: FontFamily.serif, fontSize: 19, lineHeight: 28, color: Colors.ink },
-  quoteMeta: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 16 },
-
-  empty: { padding: 40, alignItems: 'center' },
-
-  infoSection: { marginHorizontal: 24, marginTop: 16 },
-  infoRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 14, borderBottomWidth: 1, borderBottomColor: Colors.line },
-
-  chevron: { width: 10, height: 2, backgroundColor: Colors.ink, borderRadius: 1 },
-  chevronBottom: { width: 10, height: 2, backgroundColor: Colors.ink, borderRadius: 1, marginTop: -2 },
-  dot: { width: 5, height: 5, borderRadius: 2.5, backgroundColor: Colors.ink },
+  title: { fontFamily: FontFamily.serifMedium, fontSize: 32, lineHeight: 42, color: Palette.mainText, textAlign: 'center' },
+  author: { fontFamily: FontFamily.sans, fontSize: 16, color: Palette.mainText, textAlign: 'center' },
+  meta: { flexDirection: 'row', alignItems: 'center', gap: 40 },
+  genre: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 999 },
+  genreLabel: { fontFamily: FontFamily.sans, fontSize: 14, color: Palette.buttonText },
+  stars: { flexDirection: 'row' },
+  progress: { gap: 8 },
+  progressRow: { flexDirection: 'row', justifyContent: 'space-between' },
+  track: { height: 4, borderRadius: 2, backgroundColor: Palette.subtleOutline, overflow: 'hidden' },
+  fill: { height: 4, borderRadius: 2, backgroundColor: Palette.highlightOutline },
+  actions: { flexDirection: 'row', gap: 12 },
+  add: { width: 56, height: 50, borderRadius: 999, backgroundColor: Palette.primary, alignItems: 'center', justifyContent: 'center' },
+  segments: {
+    flexDirection: 'row', padding: 4, gap: 4, borderRadius: 999,
+    backgroundColor: 'rgba(255,255,255,0.65)', borderWidth: 1, borderColor: '#F7F7F7',
+  },
+  segment: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, height: 32, borderRadius: 999 },
+  segmentOn: { backgroundColor: '#D9D9D9' },
+  segmentLabel: { fontFamily: FontFamily.sans, fontSize: 12, color: Palette.mainText },
+  body: { fontFamily: FontFamily.sans, fontSize: 16, lineHeight: 21, color: Palette.mainText },
+  muted: { fontFamily: FontFamily.sans, fontSize: 16, lineHeight: 21, color: MUTED },
+  facts: { flexDirection: 'row', gap: 16 },
+  factLabel: { fontFamily: FontFamily.sansSemiBold, fontSize: 16, lineHeight: 21, color: Palette.mainText },
 });
