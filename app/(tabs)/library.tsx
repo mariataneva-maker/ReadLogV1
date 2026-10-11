@@ -6,7 +6,7 @@ import { useRouter } from 'expo-router';
 import { useBooksStore, type ReadStatus } from '../../src/store/books';
 import { Chip } from '../../src/components/ui';
 import { FABMenu } from '../../src/components';
-import { Palette, FontFamily } from '../../src/theme';
+import { Palette, Type } from '../../src/theme';
 
 const FILTERS: { status: ReadStatus; label: string }[] = [
   { status: 'reading', label: 'Reading' },
@@ -59,11 +59,11 @@ export default function LibraryScreen() {
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: Palette.background },
   content: { padding: PADDING, paddingBottom: 160, gap: 24 },
-  title: { fontFamily: FontFamily.sansSemiBold, fontSize: 36, color: Palette.mainText, marginTop: 8 },
+  title: { ...Type.titleScreen, color: Palette.mainText, marginTop: 8 },
   chips: { flexDirection: 'row', gap: 8 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: GAP, rowGap: 20 },
   cover: { width: '100%', borderRadius: 4, backgroundColor: Palette.subtleOutline },
-  bookTitle: { fontFamily: FontFamily.sans, fontSize: 14, color: Palette.mainText, marginTop: 8 },
-  author: { fontFamily: FontFamily.sans, fontSize: 12, color: Palette.secondaryText, marginTop: 2 },
-  empty: { fontFamily: FontFamily.sans, fontSize: 14, color: Palette.secondaryText },
+  bookTitle: { ...Type.meta, color: Palette.mainText, marginTop: 8 },
+  author: { ...Type.labelSmall, color: Palette.secondaryText, marginTop: 2 },
+  empty: { ...Type.meta, color: Palette.secondaryText },
 });

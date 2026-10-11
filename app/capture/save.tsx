@@ -10,7 +10,7 @@ import { useBooksStore } from '../../src/store/books';
 import { BookCard } from '../../src/components';
 import { Button, Chip, TagChip, SheetHeader, FieldLabel, ui } from '../../src/components/ui';
 import { closeCapture, pickBook, type CaptureParams, type CaptureSource } from '../../src/capture';
-import { Palette, FontFamily } from '../../src/theme';
+import { Palette, Type } from '../../src/theme';
 
 const SOURCE_LABEL: Record<CaptureSource, string> = { snapped: 'Snapped', spoken: 'Spoken', typed: 'Typed' };
 
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
   why: { minHeight: 72, textAlignVertical: 'top' },
   tags: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8 },
   tagInput: {
-    fontFamily: FontFamily.sans, fontSize: 15, color: Palette.mainText, minWidth: 100,
+    ...Type.labelButton, color: Palette.mainText, minWidth: 100,
     paddingHorizontal: 16, paddingVertical: 8, borderRadius: 999,
     backgroundColor: Palette.buttonText, borderWidth: 1, borderColor: Palette.highlightOutline,
   },

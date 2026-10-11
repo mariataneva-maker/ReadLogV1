@@ -3,9 +3,8 @@ import React from 'react';
 import { View, Text, Image, Pressable, StyleSheet } from 'react-native';
 import type { Book, Quote, Note } from '../store/books';
 import { TagChip } from './ui';
-import { Palette, FontFamily } from '../theme';
+import { Palette, FontFamily, Type } from '../theme';
 
-const MUTED = '#6B7C74';
 
 export function splitTags(tag?: string): string[] {
   return (tag ?? '').split(',').map((t) => t.trim()).filter(Boolean);
@@ -43,8 +42,8 @@ const styles = StyleSheet.create({
   meta: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 16 },
   source: { flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 1 },
   cover: { width: 20, height: 30, borderRadius: 2, backgroundColor: Palette.subtleOutline },
-  muted: { fontFamily: FontFamily.sans, fontSize: 16, lineHeight: 21, color: MUTED, flexShrink: 1 },
-  text: { fontFamily: FontFamily.sans, fontSize: 16, lineHeight: 22, color: Palette.mainText },
+  muted: { ...Type.body, color: Palette.mutedText, flexShrink: 1 },
+  text: { ...Type.body, color: Palette.mainText },
   tags: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 8 },
 });
 
@@ -52,10 +51,10 @@ const styles = StyleSheet.create({
 export const listScreenStyles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: Palette.background },
   content: { paddingHorizontal: 16, paddingTop: 8, paddingBottom: 180, gap: 16 },
-  title: { fontFamily: FontFamily.sansSemiBold, fontSize: 36, color: Palette.mainText, marginBottom: 8 },
+  title: { ...Type.titleScreen, color: Palette.mainText, marginBottom: 8 },
   chipScroll: { marginHorizontal: -16, marginBottom: 8 },
   chips: { gap: 8, paddingHorizontal: 16 },
   empty: { alignItems: 'center', paddingTop: 48, gap: 8 },
-  emptyTitle: { fontFamily: FontFamily.serifMedium, fontSize: 20, color: Palette.mainText },
-  emptyText: { fontFamily: FontFamily.sans, fontSize: 14, color: Palette.secondaryText, textAlign: 'center' },
+  emptyTitle: { ...Type.titleSheet, color: Palette.mainText },
+  emptyText: { ...Type.meta, color: Palette.secondaryText, textAlign: 'center' },
 });

@@ -7,7 +7,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useBooksStore, type ReadStatus } from '../../src/store/books';
 import { Chip } from '../../src/components/ui';
 import { BookCard, FABMenu } from '../../src/components';
-import { Palette, FontFamily } from '../../src/theme';
+import { Palette, Type, Effects } from '../../src/theme';
 
 const FILTERS: { status: ReadStatus; label: string }[] = [
   { status: 'reading', label: 'Reading' },
@@ -78,22 +78,22 @@ const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: Palette.background },
   content: { paddingTop: 8, paddingBottom: 180, gap: 32 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16 },
-  title: { fontFamily: FontFamily.sansSemiBold, fontSize: 36, color: Palette.mainText },
+  title: { ...Type.titleScreen, color: Palette.mainText },
   profile: {
     width: 56, height: 56, borderRadius: 28, backgroundColor: Palette.secondary,
     alignItems: 'center', justifyContent: 'center',
   },
   today: { gap: 16 },
-  question: { fontFamily: FontFamily.sans, fontSize: 20, lineHeight: 26, color: Palette.mainText, paddingHorizontal: 16 },
+  question: { ...Type.headingSection, color: Palette.mainText, paddingHorizontal: 16 },
   // Extra vertical room so the covers' shadows aren't clipped by the scroll view.
   carousel: { marginVertical: -16 },
   carouselContent: { gap: 12, paddingHorizontal: 16, paddingVertical: 16 },
   // The shadow sits on the wrapper because a rounded image clips its own shadow.
   readingCard: {
-    shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.22, shadowRadius: 12,
+    ...Effects.cover,
   },
   readingCover: { width: 108, height: 162, borderRadius: 4, backgroundColor: Palette.subtleOutline },
   chips: { flexDirection: 'row', gap: 8, paddingHorizontal: 16, marginBottom: -8 },
   list: { gap: 16, paddingHorizontal: 16 },
-  empty: { fontFamily: FontFamily.sans, fontSize: 14, color: Palette.secondaryText },
+  empty: { ...Type.meta, color: Palette.secondaryText },
 });

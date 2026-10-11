@@ -7,7 +7,7 @@ import * as Haptics from 'expo-haptics';
 import { useBooksStore } from '../../src/store/books';
 import { SheetHeader, type IconName } from '../../src/components/ui';
 import { pickBook, type CaptureParams } from '../../src/capture';
-import { Palette, FontFamily } from '../../src/theme';
+import { Palette, Type } from '../../src/theme';
 
 const OPTIONS: { path: '/capture/snap' | '/capture/speak' | '/capture/save'; icon: IconName; title: string; hint: string }[] = [
   { path: '/capture/snap', icon: 'camera-outline', title: 'Snap the page', hint: 'Fastest for long passages' },
@@ -82,6 +82,6 @@ const styles = StyleSheet.create({
     width: 48, height: 48, borderRadius: 24, backgroundColor: Palette.background,
     alignItems: 'center', justifyContent: 'center',
   },
-  rowTitle: { fontFamily: FontFamily.sansSemiBold, fontSize: 16, color: Palette.mainText },
-  rowHint: { fontFamily: FontFamily.sans, fontSize: 14, color: Palette.secondaryText, marginTop: 2 },
+  rowTitle: { ...Type.bodyStrong, color: Palette.mainText },
+  rowHint: { ...Type.meta, color: Palette.secondaryText, marginTop: 2 },
 });

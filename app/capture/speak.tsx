@@ -10,7 +10,7 @@ import * as Haptics from 'expo-haptics';
 import { useBooksStore } from '../../src/store/books';
 import { Button, Chip, CloseButton, SheetHeader, FieldLabel, ui } from '../../src/components/ui';
 import { closeCapture, pickBook, splitSpokenPage, formatTime, type CaptureKind, type CaptureParams } from '../../src/capture';
-import { Palette, FontFamily } from '../../src/theme';
+import { Palette, FontFamily, Type } from '../../src/theme';
 
 const BARS = 24;
 const silence = () => Array.from({ length: BARS }, () => 0);
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
   status: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingTop: 24 },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: Palette.secondary },
   statusText: { fontFamily: FontFamily.sansSemiBold, fontSize: 14, color: Palette.secondary },
-  transcript: { fontFamily: FontFamily.serifMedium, fontSize: 26, lineHeight: 38, color: Palette.mainText },
+  transcript: { ...Type.transcript, color: Palette.mainText },
   pending: { color: Palette.secondaryText, opacity: 0.6 },
   wave: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 4, height: 52 },
   bar: { width: 4, borderRadius: 2, backgroundColor: Palette.primary },
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
   stop: { width: 88, height: 88, borderRadius: 44, backgroundColor: Palette.primary, alignItems: 'center', justifyContent: 'center' },
   stopSquare: { width: 26, height: 26, borderRadius: 5, backgroundColor: Palette.buttonText },
   switchRow: { flexDirection: 'row', justifyContent: 'center', gap: 8 },
-  edit: { fontFamily: FontFamily.sans, fontSize: 18, lineHeight: 28, color: Palette.mainText, minHeight: 140, textAlignVertical: 'top' },
+  edit: { ...Type.bodyLarge, color: Palette.mainText, minHeight: 140, textAlignVertical: 'top' },
   chips: { flexDirection: 'row', gap: 8 },
   play: {
     flexDirection: 'row', alignItems: 'center', gap: 12, backgroundColor: Palette.buttonText,

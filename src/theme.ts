@@ -93,8 +93,40 @@ export const Palette = {
   subtleOutline: '#EAE6E1',
   highlightOutline: '#B5493A',
   buttonText: '#FFFFFF',
+  mutedText: '#6B7C74',
+  cardBackground: '#FBFBFF',
+  segmentSelected: '#D9D9D9',
   sheet: '#EAEBE6',
   tag: '#9BABA4',
   chipSelected: '#524E50',
   camera: '#1F1D1D',
+} as const;
+
+/** Figma colour/genre/1–6, used for genre chips. */
+export const GenreColours = ['#6DA34D', '#D95F2C', '#4F7CAC', '#9B5DA8', '#C4504A', '#3E8E86'] as const;
+
+/** Figma size/space/* and size/radius/*. */
+export const Space = { 4: 4, 8: 8, 12: 12, 16: 16, 24: 24, 32: 32 } as const;
+export const Radii = { sm: 4, md: 16, sheet: 28, full: 999 } as const;
+
+/** Figma text styles, same names. */
+export const Type = {
+  titleScreen: { fontFamily: FontFamily.sansSemiBold, fontSize: 36 }, // Title/Screen
+  titleBook: { fontFamily: FontFamily.serifMedium, fontSize: 32, lineHeight: 42 }, // Title/Book
+  titleSheet: { fontFamily: FontFamily.serifMedium, fontSize: 20, lineHeight: 28 }, // Title/Sheet
+  headingSection: { fontFamily: FontFamily.sans, fontSize: 20, lineHeight: 26 }, // Heading/Section
+  transcript: { fontFamily: FontFamily.serifMedium, fontSize: 26, lineHeight: 38 }, // Reading/Transcript
+  bodyLarge: { fontFamily: FontFamily.sans, fontSize: 18, lineHeight: 28 }, // Body/Large
+  body: { fontFamily: FontFamily.sans, fontSize: 16, lineHeight: 22 }, // Body/Default
+  bodyStrong: { fontFamily: FontFamily.sansSemiBold, fontSize: 16, lineHeight: 22 }, // Body/Strong
+  meta: { fontFamily: FontFamily.sans, fontSize: 14, lineHeight: 18 }, // Meta
+  labelButton: { fontFamily: FontFamily.sans, fontSize: 14, lineHeight: 18 }, // Label/Button
+  labelSmall: { fontFamily: FontFamily.sans, fontSize: 12, lineHeight: 16 }, // Label/Small
+} as const;
+
+/** Figma effect styles. */
+export const Effects = {
+  coverLarge: { shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.4, shadowRadius: 20 }, // Shadow/Cover large
+  cover: { shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.22, shadowRadius: 12 }, // Shadow/Cover
+  glow: { shadowColor: Palette.highlightOutline, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.35, shadowRadius: 12 }, // Glow/Highlight
 } as const;

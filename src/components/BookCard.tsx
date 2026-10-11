@@ -2,7 +2,7 @@
 import React from 'react';
 import { View, Text, Image, Pressable, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import type { Book } from '../store/books';
-import { Palette, FontFamily } from '../theme';
+import { Palette, FontFamily, Type } from '../theme';
 
 export function BookCard({ book, onPress, style }: { book: Book; onPress?: () => void; style?: StyleProp<ViewStyle> }) {
   const progress = book.totalPages ? Math.min(1, book.currentPage / book.totalPages) : 0;
@@ -25,13 +25,13 @@ export function BookCard({ book, onPress, style }: { book: Book; onPress?: () =>
 const styles = StyleSheet.create({
   card: {
     flexDirection: 'row', alignItems: 'center', gap: 17, padding: 16,
-    backgroundColor: '#FBFBFF', borderRadius: 16, borderWidth: 1, borderColor: Palette.subtleOutline,
+    backgroundColor: Palette.cardBackground, borderRadius: 16, borderWidth: 1, borderColor: Palette.subtleOutline,
   },
   pressed: { opacity: 0.75 },
   cover: { width: 38, height: 56, borderRadius: 2, backgroundColor: Palette.subtleOutline },
   info: { flex: 1, gap: 8 },
-  title: { fontFamily: FontFamily.sans, fontSize: 16, lineHeight: 21, color: Palette.mainText },
-  author: { fontFamily: FontFamily.sans, fontSize: 14, lineHeight: 18, color: '#6B7C74' },
+  title: { ...Type.body, color: Palette.mainText },
+  author: { ...Type.meta, color: Palette.mutedText },
   track: { height: 4, borderRadius: 2, backgroundColor: Palette.subtleOutline, overflow: 'hidden' },
   fill: { height: 4, borderRadius: 2, backgroundColor: Palette.highlightOutline },
 });

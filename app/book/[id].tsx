@@ -8,7 +8,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useBooksStore, type Book } from '../../src/store/books';
 import { Button, type IconName } from '../../src/components/ui';
 import { Entry } from '../../src/components/Entry';
-import { Palette, FontFamily } from '../../src/theme';
+import { Palette, Type, Effects, GenreColours } from '../../src/theme';
 
 type Section = 'overview' | 'quotes' | 'notes';
 
@@ -18,15 +18,13 @@ const SECTIONS: { key: Section; label: string; icon: IconName }[] = [
   { key: 'notes', label: 'Notes', icon: 'note-edit-outline' },
 ];
 
-// Genre chips get a steady colour per genre, like the varied chips in the Figma frames.
-const GENRE_COLOURS = ['#6DA34D', '#D95F2C', '#4F7CAC', '#9B5DA8', '#C4504A', '#3E8E86'];
+// Genre chips get a steady colour per genre from Figma colour/genre/1–6.
 function genreColour(genre: string) {
   let h = 0;
   for (const c of genre) h = (h * 31 + c.charCodeAt(0)) >>> 0;
-  return GENRE_COLOURS[h % GENRE_COLOURS.length];
+  return GenreColours[h % GenreColours.length];
 }
 
-const MUTED = '#6B7C74';
 
 export default function BookDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -153,13 +151,13 @@ const styles = StyleSheet.create({
   hero: { alignItems: 'center', gap: 16, marginTop: -16 },
   cover: {
     width: 135, height: 206, backgroundColor: Palette.subtleOutline,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.4, shadowRadius: 20,
+    ...Effects.coverLarge,
   },
-  title: { fontFamily: FontFamily.serifMedium, fontSize: 32, lineHeight: 42, color: Palette.mainText, textAlign: 'center' },
-  author: { fontFamily: FontFamily.sans, fontSize: 16, color: Palette.mainText, textAlign: 'center' },
+  title: { ...Type.titleBook, color: Palette.mainText, textAlign: 'center' },
+  author: { ...Type.body, color: Palette.mainText, textAlign: 'center' },
   meta: { flexDirection: 'row', alignItems: 'center', gap: 40 },
   genre: { paddingHorizontal: 8, paddingVertical: 4, borderRadius: 999 },
-  genreLabel: { fontFamily: FontFamily.sans, fontSize: 14, color: Palette.buttonText },
+  genreLabel: { ...Type.meta, color: Palette.buttonText },
   stars: { flexDirection: 'row' },
   progress: { gap: 8 },
   progressRow: { flexDirection: 'row', justifyContent: 'space-between' },
@@ -172,10 +170,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.65)', borderWidth: 1, borderColor: '#F7F7F7',
   },
   segment: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, height: 32, borderRadius: 999 },
-  segmentOn: { backgroundColor: '#D9D9D9' },
-  segmentLabel: { fontFamily: FontFamily.sans, fontSize: 12, color: Palette.mainText },
-  body: { fontFamily: FontFamily.sans, fontSize: 16, lineHeight: 21, color: Palette.mainText },
-  muted: { fontFamily: FontFamily.sans, fontSize: 16, lineHeight: 21, color: MUTED },
+  segmentOn: { backgroundColor: Palette.segmentSelected },
+  segmentLabel: { ...Type.labelSmall, color: Palette.mainText },
+  body: { ...Type.body, color: Palette.mainText },
+  muted: { ...Type.body, color: Palette.mutedText },
   facts: { flexDirection: 'row', gap: 16 },
-  factLabel: { fontFamily: FontFamily.sansSemiBold, fontSize: 16, lineHeight: 21, color: Palette.mainText },
+  factLabel: { ...Type.bodyStrong, color: Palette.mainText },
 });

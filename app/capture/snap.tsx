@@ -12,7 +12,7 @@ import * as Haptics from 'expo-haptics';
 import { useBooksStore } from '../../src/store/books';
 import { Button, Chip, CloseButton, SheetHeader, ui, type IconName } from '../../src/components/ui';
 import { closeCapture, pickBook, splitPageNumber, joinLines, looksMisread, countWord, type CaptureParams } from '../../src/capture';
-import { Palette, FontFamily } from '../../src/theme';
+import { Palette, Type } from '../../src/theme';
 
 type Step = 'aim' | 'reading' | 'review';
 
@@ -175,15 +175,15 @@ const styles = StyleSheet.create({
   overlay: { flex: 1, justifyContent: 'space-between' },
   topBar: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingTop: 8 },
   pill: { backgroundColor: 'rgba(255,255,255,0.16)', borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8 },
-  pillText: { fontFamily: FontFamily.sans, fontSize: 14, color: Palette.buttonText },
+  pillText: { ...Type.meta, color: Palette.buttonText },
   guide: {
     alignSelf: 'center', width: '84%', height: 140, borderRadius: 12,
     borderWidth: 2, borderColor: Palette.secondary, backgroundColor: 'rgba(212,100,92,0.10)',
   },
-  onDark: { fontFamily: FontFamily.sans, fontSize: 16, color: Palette.buttonText, textAlign: 'center' },
+  onDark: { ...Type.body, color: Palette.buttonText, textAlign: 'center' },
   controls: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 40, paddingBottom: 24 },
   side: { width: 56, alignItems: 'center', gap: 4 },
-  sideLabel: { fontFamily: FontFamily.sans, fontSize: 12, color: Palette.buttonText },
+  sideLabel: { ...Type.labelSmall, color: Palette.buttonText },
   shutter: {
     width: 80, height: 80, borderRadius: 40, borderWidth: 4, borderColor: Palette.buttonText,
     alignItems: 'center', justifyContent: 'center',
@@ -194,7 +194,7 @@ const styles = StyleSheet.create({
   reviewContent: { padding: 16, gap: 16 },
   row: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   scan: { height: 96, borderRadius: 12, backgroundColor: Palette.camera },
-  text: { fontFamily: FontFamily.sans, fontSize: 18, lineHeight: 28, color: Palette.mainText },
+  text: { ...Type.bodyLarge, color: Palette.mainText },
   misread: { color: Palette.highlightOutline, textDecorationLine: 'underline' },
   dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: Palette.secondary },
   line: { flexDirection: 'row', gap: 10, paddingVertical: 6, alignItems: 'flex-start' },

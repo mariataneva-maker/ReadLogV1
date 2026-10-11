@@ -2,7 +2,7 @@
 import React from 'react';
 import { Pressable, Text, View, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Palette, FontFamily } from '../theme';
+import { Palette, FontFamily, Type } from '../theme';
 
 export type IconName = React.ComponentProps<typeof MaterialCommunityIcons>['name'];
 
@@ -84,8 +84,8 @@ export const ui = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 14,
   },
-  body: { fontFamily: FontFamily.sans, fontSize: 16, lineHeight: 24, color: Palette.mainText },
-  meta: { fontFamily: FontFamily.sans, fontSize: 14, color: Palette.secondaryText },
+  body: { ...Type.body, color: Palette.mainText },
+  meta: { ...Type.meta, color: Palette.secondaryText },
 });
 
 const styles = StyleSheet.create({
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
   secondary: { borderWidth: 1, borderColor: Palette.primary },
   tertiary: { paddingHorizontal: 12 },
   disabled: { opacity: 0.4 },
-  buttonLabel: { fontFamily: FontFamily.sansMedium, fontSize: 15 },
+  buttonLabel: { ...Type.labelButton },
   labelOnPrimary: { color: Palette.buttonText },
   labelPrimary: { color: Palette.primary },
   labelOnDark: { color: Palette.buttonText },
@@ -111,12 +111,12 @@ const styles = StyleSheet.create({
     backgroundColor: Palette.buttonText, borderWidth: 1, borderColor: Palette.subtleOutline,
   },
   chipOn: { backgroundColor: Palette.chipSelected, borderColor: Palette.chipSelected },
-  chipLabel: { fontFamily: FontFamily.sans, fontSize: 15, color: Palette.mainText },
+  chipLabel: { ...Type.labelButton, color: Palette.mainText },
   chipLabelOn: { color: Palette.buttonText },
   tag: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999, backgroundColor: Palette.tag },
-  tagLabel: { fontFamily: FontFamily.sans, fontSize: 13, color: Palette.buttonText },
+  tagLabel: { ...Type.labelSmall, color: Palette.buttonText },
   header: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  title: { fontFamily: FontFamily.serifMedium, fontSize: 20, lineHeight: 28, color: Palette.mainText },
-  subtitle: { fontFamily: FontFamily.sans, fontSize: 14, color: Palette.secondaryText, marginTop: 2 },
-  fieldLabel: { fontFamily: FontFamily.sans, fontSize: 14, color: Palette.secondaryText, marginBottom: 6 },
+  title: { ...Type.titleSheet, color: Palette.mainText },
+  subtitle: { ...Type.meta, color: Palette.secondaryText, marginTop: 2 },
+  fieldLabel: { ...Type.meta, color: Palette.secondaryText, marginBottom: 6 },
 });

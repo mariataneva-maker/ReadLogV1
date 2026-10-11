@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { AccessibilityInfo, Animated, Easing, Pressable, StyleSheet, Text, View } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import { FontFamily, Palette, Shadow } from '../theme';
+import { FontFamily, Palette, Shadow, Type, Effects } from '../theme';
 import type { IconName } from './ui';
 
 interface Props {
@@ -159,8 +159,8 @@ const styles = StyleSheet.create({
     backgroundColor: Palette.buttonText,
     // Terracotta outline and glow (the progress-bar colour) so options stand out over content.
     borderWidth: 1, borderColor: Palette.highlightOutline,
-    shadowColor: Palette.highlightOutline, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.35, shadowRadius: 12,
+    ...Effects.glow,
     elevation: 6,
   },
-  itemLabel: { fontFamily: FontFamily.sans, fontSize: 15, color: Palette.mainText },
+  itemLabel: { ...Type.labelButton, color: Palette.mainText },
 });
